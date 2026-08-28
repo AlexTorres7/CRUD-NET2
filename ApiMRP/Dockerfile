@@ -2,8 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["src/API/ApiMRP.csproj", "src/API/"]
-RUN dotnet restore "src/API/ApiMRP.csproj"
+COPY ["ApiMRP/src/API/ApiMRP.csproj", "src/API/"]
+RUN dotnet restore "ApiMRP/src/API/ApiMRP.csproj"
 
 COPY . .
 WORKDIR "/src/src/API"

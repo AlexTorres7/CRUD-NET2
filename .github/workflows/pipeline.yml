@@ -65,7 +65,8 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Compilar imagen localmente
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+          ./ApiMRP
           
           # Subir etiquetas a ECR
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

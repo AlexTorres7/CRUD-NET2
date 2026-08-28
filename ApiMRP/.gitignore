@@ -1,0 +1,42 @@
+## .NET / C# 
+bin/
+obj/
+out/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+
+## Visual Studio / VS Code / IDEs
+.vs/
+.vscode/
+*.swp
+*.~*
+
+## Archivos de Entorno y Claves Sensibles
+*.env
+*.env.*
+appsettings.Development.json
+appsettings.Local.json
+
+## Terraform (Infraestructura)
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+*.tfvars
+!example.tfvars
+
+## Docker & Sistema Operativo
+.DS_Store
+Thumbs.db
+desktop.ini

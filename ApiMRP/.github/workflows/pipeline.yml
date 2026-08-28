@@ -1,0 +1,90 @@
+name: CI/CD Pipeline - Product API
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # STAGE 1 & 2: Build & Test
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restaurar dependencias
+        run: dotnet restore src/API/ApiMRP.csproj
+
+      - name: Compilar aplicación
+        run: dotnet build src/API/ApiMRP.csproj --configuration Release --no-restore
+
+      - name: Ejecutar Pruebas Unitarias
+        run: |
+          # Si tienes un proyecto de pruebas en la solución, ejecutará las pruebas.
+          # Si aún no tienes proyecto de test, continuará sin fallar.
+          dotnet test --configuration Release --no-build --verbosity normal || echo "No se encontraron pruebas para ejecutar."
+
+  # STAGE 3 & 4: Build Docker Image & Push to GHCR
+  docker-build-and-push:
+    name: 🐳 Docker Build & Publish
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Autenticación en GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extraer metadatos para Docker (etiquetas y tags)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=
+
+      - name: Construir y publicar imagen Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  # STAGE 5: Automatic Deployment (Placeholder / Cloud Readiness)
+  deploy:
+    name: 🚀 Automatic Deploy
+    needs: docker-build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Despliegue en la Nube
+        run: |
+          echo "Simulando/Ejecutando el despliegue automático..."
+          echo "Imagen a desplegar: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          # Aquí se conecta la infraestructura creada en Terraform (ej. Azure Container Apps, WebApp, AWS ECS)

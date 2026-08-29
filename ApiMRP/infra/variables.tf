@@ -4,7 +4,7 @@ variable "aws_region" {
   description = "Región de AWS donde se desplegarán los recursos"
 }
 
-variable "project_name" {
+variable "app_name" {
   type        = string
   default     = "apimrp"
   description = "Nombre base para los recursos"

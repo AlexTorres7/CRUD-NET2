@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apimrp-deployment
+  labels:
+    app: apimrp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: apimrp
+  template:
+    metadata:
+      labels:
+        app: apimrp
+    spec:
+      containers:
+      - name: apimrp-api
+        image: product-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_HTTP_PORTS
+          value: "8080"
+        - name: ConnectionStrings__DefaultConnection
+          value: "Host=kubernetes.docker.internal;Port=5433;Database=ProductCatalogDb;Username=postgres;Password=mysecretpassword123"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apimrp-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: apimrp
